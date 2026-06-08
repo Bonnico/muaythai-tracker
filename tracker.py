@@ -31,4 +31,28 @@ def log_session():
     df.to_csv(LOG_FILE, index=False)
     print(f"\nSession logged. Total sessions: {len(df)}")
 
-log_session()
+
+
+def view_sessions():
+    if not os.path.exists(LOG_FILE):
+        print("No sessions logged yet.")
+        return
+    
+    df = pd.read_csv(LOG_FILE)
+    print("\n--- Your Training Sessions ---")
+    print(df.to_string(index=False))
+    print(f"\nTotal sessions: {len(df)}")
+    print(f"Total training time: {df['duration_min'].sum()} minutes")
+    print(f"Average intensity: {df['intensity'].mean():.1f}/10")
+
+print("\nWhat do you want to do?")
+print("1 - Log a session")
+print("2 - View all sessions")
+choice = input("Enter 1 or 2: ")
+
+if choice == "1":
+    log_session()
+elif choice == "2":
+    view_sessions()
+else:
+    print("Invalid choice.")
