@@ -1,1 +1,2 @@
 Day 1 — built input logger. Next: view past sessions.
+Day 2 — added viewer and basic stats. Next: filter sessions by type.

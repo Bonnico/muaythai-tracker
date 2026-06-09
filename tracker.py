@@ -24,7 +24,7 @@ def log_session():
 
     if os.path.exists(LOG_FILE):
         df_existing = pd.read_csv(LOG_FILE)
-        df = pd.concat([df_existing. df_new], ignore_index=True)
+        df = pd.concat([df_existing, df_new], ignore_index=True)
     else:
         df = df_new
 
@@ -45,14 +45,40 @@ def view_sessions():
     print(f"Total training time: {df['duration_min'].sum()} minutes")
     print(f"Average intensity: {df['intensity'].mean():.1f}/10")
 
+
+def filter_sessions():
+    if not os.path.exists(LOG_FILE):
+        print("No sessions logged yet.")
+        return
+    
+    df = pd.read_csv(LOG_FILE)
+    print("\nSession types in your log:", df['type'].unique())
+    session_type = input("Enter session type to filter: ")
+
+    filtered = df[df['type'].str.lower() == session_type.lower()]
+
+    if filtered.empty:
+        print(f"No sessions found for type: {session_type}")
+        return
+
+    print(f"\n--- {session_type.upper()} Sessions ---")
+    print(filtered.to_string(index=False))
+    print(f"\nTotal {session_type} sessions: {len(filtered)}")
+    print(f"Total time: {filtered['duration_min'].sum()} minutes")
+    print(f"Average intensity: {filtered['intensity'].mean():.1f}/10")
+
+
 print("\nWhat do you want to do?")
 print("1 - Log a session")
 print("2 - View all sessions")
-choice = input("Enter 1 or 2: ")
+print("3 - Filter by session type")
+choice = input("Enter 1, 2, or 3: ")
 
 if choice == "1":
     log_session()
 elif choice == "2":
     view_sessions()
+elif choice == "3":
+    filter_sessions()
 else:
     print("Invalid choice.")
