@@ -67,12 +67,45 @@ def filter_sessions():
     print(f"Total time: {filtered['duration_min'].sum()} minutes")
     print(f"Average intensity: {filtered['intensity'].mean():.1f}/10")
 
+def filter_by_date():
+    if not os.path.exists(LOG_FILE):
+        print("No sessions logged yet.")
+        return
+    
+    df = pd.read_csv(LOG_FILE)
+    df['date'] = pd.to_datetime(df['date'])
+
+    print("\nEnter date range (YYYY-MM-DD format)")
+    start = input("Start date: ")
+    end = input("End date: ")
+
+    try:
+        start_date = pd.to_datetime(start)
+        end_date = pd.to_datetime(end)
+    except ValueError:
+        print("Invalid date format. Use YYYY-MM-DD.")
+        return
+    
+    filtered = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+
+    if filtered.empty:
+        print("No sessions found in that date range.")
+        return
+    
+    print(f"\n--- Sessions from {start} to {end} ---")
+    print(filtered.to_string(index=False))
+    print(f"\nTotal sessions: {len(filtered)}")
+    print(f"Total training time: {filtered['duration_min'].sum()} minutes")
+    print(f"Average intensity: {filtered['intensity'].mean():.1f}/10")
+        
+
 
 print("\nWhat do you want to do?")
 print("1 - Log a session")
 print("2 - View all sessions")
 print("3 - Filter by session type")
-choice = input("Enter 1, 2, or 3: ")
+print("4 - Filter by date range")
+choice = input("Enter 1, 2, 3, or 4: ")
 
 if choice == "1":
     log_session()
@@ -80,5 +113,7 @@ elif choice == "2":
     view_sessions()
 elif choice == "3":
     filter_sessions()
+elif choice == "4":
+    filter_by_date()
 else:
     print("Invalid choice.")
