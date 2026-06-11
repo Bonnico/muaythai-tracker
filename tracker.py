@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from datetime import date
+import matplotlib.pyplot as plt
 
 LOG_FILE = "data/sessions.csv"
 
@@ -98,6 +99,34 @@ def filter_by_date():
     print(f"Total training time: {filtered['duration_min'].sum()} minutes")
     print(f"Average intensity: {filtered['intensity'].mean():.1f}/10")
         
+def visualize_sessions():
+    if not os.path.exists(LOG_FILE):
+        print("No sessions logged yet.")
+        return
+    
+    df = pd.read_csv(LOG_FILE)
+    df['date'] = pd.to_datetime(df['date'])
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+    ax1.plot(df['date'], df['intensity'], marker='o', color='red', linewidth=2)
+    ax1.set_title('Training Intensity Over Time')
+    ax1.set_xlabel('Date')
+    ax1.set_ylabel('Intensity (1-10)')
+    ax1.tick_params(axis='x', rotation=45)
+    ax1.grid(True, alpha=0.3)
+
+    type_counts = df['type'].value_counts()
+    ax2.bar(type_counts.index, type_counts.values, color='red', alpha=0.7)
+    ax2.set_title('Sessions by Type')
+    ax2.set_xlabel('Session Type')
+    ax2.set_ylabel('Count')
+
+    plt.tight_layout()
+    plt.savefig('data/training_overview.png')
+    plt.show()
+    print("\nChart saved to data/training_overview.png")
+
 
 
 print("\nWhat do you want to do?")
@@ -105,7 +134,8 @@ print("1 - Log a session")
 print("2 - View all sessions")
 print("3 - Filter by session type")
 print("4 - Filter by date range")
-choice = input("Enter 1, 2, 3, or 4: ")
+print("5 - Visualize training data")
+choice = input("Enter 1, 2, 3, 4, or 5: ")
 
 if choice == "1":
     log_session()
@@ -115,5 +145,7 @@ elif choice == "3":
     filter_sessions()
 elif choice == "4":
     filter_by_date()
+elif choice == "5":
+    visualize_sessions()
 else:
     print("Invalid choice.")
