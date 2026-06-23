@@ -2,3 +2,4 @@ Day 1 — built input logger. Next: view past sessions.
 Day 2 — added viewer and basic stats. Next: filter sessions by type.
 Day 3 — added session filter. Next: add date range filtering.
 Day 4 — added date range filter. Next: visualize training data with matplotlib.
+Day 5 — first charts built. Next: weekly summary stats. 

@@ -127,6 +127,38 @@ def visualize_sessions():
     plt.show()
     print("\nChart saved to data/training_overview.png")
 
+def weekly_summary():
+    if not os.path.exists(LOG_FILE):
+        print("No sessions logged yet.")
+        return
+    
+    df = pd.read_csv(LOG_FILE)
+    df['date'] = pd.to_datetime(df['date'])
+    df['week'] = df['date'].dt.isocalendar().week
+    df['year'] = df['date'].dt.isocalendar().year
+
+    summary = df.groupby(['year', 'week']).agg(
+        total_session=('type', 'count'),
+        total_minutes = ('duration_min', 'sum'),
+        avg_intensity=('intensity', 'mean')
+    ).reset_index()
+
+    summary['avg_intensity'] = summary['avg_intensity'].round(1)
+
+    print("\n--- Weekly Training Summary ---")
+    print(summary.to_string(index=False))
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    weeks = [f"W{row.week}" for row in summary.itertuples()]
+    ax.bar(weeks, summary['total_minutes'], color='red', alpha=0.7)
+    ax.set_title('Weekly Training Volume (minutes)')
+    ax.set_xlabel('Week')
+    ax.set_ylabel('Total Minutes')
+    ax.grid(True, alpha=0.3, axis='y')
+    plt.tight_layout()
+    plt.savefig('data/weekly_summary.png')
+    plt.show()
+    print("\nChart saved to data/weekly_summary.png")
 
 
 print("\nWhat do you want to do?")
@@ -135,7 +167,8 @@ print("2 - View all sessions")
 print("3 - Filter by session type")
 print("4 - Filter by date range")
 print("5 - Visualize training data")
-choice = input("Enter 1, 2, 3, 4, or 5: ")
+print("6 - Weekly summary")
+choice = input("Enter 1, 2, 3, 4, 5, or 6: ")
 
 if choice == "1":
     log_session()
@@ -147,5 +180,7 @@ elif choice == "4":
     filter_by_date()
 elif choice == "5":
     visualize_sessions()
+elif choice == "6":
+    weekly_summary()
 else:
     print("Invalid choice.")
