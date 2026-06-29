@@ -160,6 +160,35 @@ def weekly_summary():
     plt.show()
     print("\nChart saved to data/weekly_summary.png")
 
+def recovery_score():
+    if not os.path.exists(LOG_FILE):
+        print("No sessions logged yet.")
+        return
+    
+    df = pd.read_csv(LOG_FILE)
+    df['date'] = pd.to_datetime(df['date'])
+    df = df.sort_values('date')
+
+    last = df.iloc[-1]
+    today = pd.Timestamp(date.today())
+    days_since = (today - last['date']).days
+
+    load = (last['intensity']* last['duration_min']) / 60
+    recovery = min(10, round(10-load+(days_since *1.5), 1))
+
+    print(f"\n--- Recovery Score ---")
+    print(f"Last session: {last['date'].date()} — {last['type']}")
+    print(f"Intensity: {last['intensity']}/10 | Duration: {last['duration_min']} min")
+    print(f"Days since last session: {days_since}")
+    print(f"\nRecovery Score: {recovery}/10")
+    
+    if recovery >= 8:
+        print("Status: FULLY RECOVERED — go hard today")
+    elif recovery >= 5:
+        print("Status: PARTIALLY RECOVERED — moderate session")
+    else:
+        print("Status: UNDER-RECOVERED — light work or rest")
+
 
 print("\nWhat do you want to do?")
 print("1 - Log a session")
@@ -168,7 +197,8 @@ print("3 - Filter by session type")
 print("4 - Filter by date range")
 print("5 - Visualize training data")
 print("6 - Weekly summary")
-choice = input("Enter 1, 2, 3, 4, 5, or 6: ")
+print("7 - Recovery score")
+choice = input("Enter 1, 2, 3, 4, 5, 6, or 7: ")
 
 if choice == "1":
     log_session()
@@ -182,5 +212,7 @@ elif choice == "5":
     visualize_sessions()
 elif choice == "6":
     weekly_summary()
+elif choice == "7":
+    recovery_score()
 else:
     print("Invalid choice.")
